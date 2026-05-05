@@ -1,0 +1,59 @@
+name: 'Vercel Deploy'
+description: 'Pull env, build, and deploy a project to Vercel using the Vercel CLI.'
+author: 'Metarsit Leenayongwut'
+branding:
+  icon: 'upload-cloud'
+  color: 'black'
+
+inputs:
+  vercel-token:
+    description: 'Vercel access token. Create one at https://vercel.com/account/tokens.'
+    required: true
+  vercel-org-id:
+    description: 'Vercel organization (team) ID. Equivalent to VERCEL_ORG_ID.'
+    required: false
+    default: ''
+  vercel-project-id:
+    description: 'Vercel project ID. Equivalent to VERCEL_PROJECT_ID.'
+    required: false
+    default: ''
+  prod:
+    description: 'Deploy to production. Defaults to false (preview deployment).'
+    required: false
+    default: 'false'
+  prebuilt:
+    description: 'Deploy a prebuilt output (`vercel build` is run first when true). Defaults to true.'
+    required: false
+    default: 'true'
+  working-directory:
+    description: 'Directory containing the project. Defaults to the workspace root.'
+    required: false
+    default: ''
+  environment:
+    description: 'Environment passed to `vercel pull` (production | preview | development). Inferred from `prod` if empty.'
+    required: false
+    default: ''
+  scope:
+    description: 'Vercel team slug or ID for `--scope`. Optional.'
+    required: false
+    default: ''
+  build-args:
+    description: 'Additional CLI args appended to `vercel build`.'
+    required: false
+    default: ''
+  deploy-args:
+    description: 'Additional CLI args appended to `vercel deploy`.'
+    required: false
+    default: ''
+
+outputs:
+  preview-url:
+    description: 'URL of the resulting deployment (preview or production).'
+  deployment-id:
+    description: 'Vercel deployment ID parsed from the inspect URL when available.'
+  inspect-url:
+    description: 'Vercel inspect URL for the deployment, when emitted by the CLI.'
+
+runs:
+  using: 'node20'
+  main: '../dist/deploy/index.js'

@@ -1,0 +1,26 @@
+{
+  "name": "vercel-action",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GitHub Actions for the Vercel CLI: install, build, and deploy.",
+  "scripts": {
+    "build": "pnpm run build:setup && pnpm run build:deploy",
+    "build:setup": "ncc build src/setup.ts -o dist/setup --source-map --license licenses.txt",
+    "build:deploy": "ncc build src/deploy.ts -o dist/deploy --source-map --license licenses.txt",
+    "lint": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.ts\""
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/exec": "^1.1.1",
+    "@actions/io": "^1.1.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@vercel/ncc": "^0.38.3",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2"
+  },
+  "packageManager": "pnpm@10.33.3+sha512.a19744364a7e248b92657a4ca5973f9354d21caf982579674b1c539f32c7420c47138ad8b1254df07aba9bc782d9b3029e3db34d5dbff974326eb74dac8ff489"
+}
