@@ -115,6 +115,81 @@ If you do not want the deploy wrapper, the setup action plus a few `run:` steps 
   run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
 ```
 
+### Example: PR build check (no deploy)
+
+Catch broken builds in PRs without burning a deployment. Useful for monorepos where the actual deploy is handled by Vercel's Git integration.
+
+```yaml
+name: Vercel Build Check
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: metarsit/vercel-action@v1
+        with:
+          vercel-version: '53.1.1'
+
+      - name: Pull Vercel env
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+```
+
+### Example: matrix build check across multiple Vercel projects
+
+Monorepo with several Vercel-linked apps. One job per app, each pointing at a different `VERCEL_PROJECT_ID`:
+
+```yaml
+jobs:
+  build:
+    name: Build ${{ matrix.app }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app: frontend
+            project_id: VERCEL_PROJECT_ID_FRONTEND
+          - app: admin
+            project_id: VERCEL_PROJECT_ID_ADMIN
+          - app: docs
+            project_id: VERCEL_PROJECT_ID_DOCS
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars[matrix.project_id] }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - uses: metarsit/vercel-action@v1
+        with:
+          vercel-version: '53.1.1'
+
+      - run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      - run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+```
+
+> Store `VERCEL_ORG_ID` and per-app `VERCEL_PROJECT_ID_*` as repo **variables** (not secrets) — they are not sensitive and `vars.*` keeps secrets scoped to the token only.
+
 ---
 
 ## Deploy action
