@@ -1,0 +1,30 @@
+name: 'Setup Vercel CLI'
+description: 'Install the Vercel CLI on a GitHub Actions runner and add it to PATH.'
+author: 'Metarsit Leenayongwut'
+branding:
+  icon: 'triangle'
+  color: 'black'
+
+inputs:
+  vercel-version:
+    description: 'Vercel CLI version to install. Accepts a semver range, "latest", or an exact version (e.g. "53.1.1").'
+    required: false
+    default: 'latest'
+  working-directory:
+    description: 'Directory to validate the install from. Defaults to the workspace root.'
+    required: false
+    default: ''
+  cache:
+    description: 'Whether to cache the global npm install across runs.'
+    required: false
+    default: 'true'
+
+outputs:
+  vercel-version:
+    description: 'The exact installed Vercel CLI version (output of `vercel --version`).'
+  vercel-path:
+    description: 'Absolute path to the installed `vercel` executable.'
+
+runs:
+  using: 'node20'
+  main: 'dist/setup/index.js'
