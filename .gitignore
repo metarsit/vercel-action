@@ -7,4 +7,6 @@ lib/
 .vercel
 coverage/
 .pnpm-store/
-dist/
+# NOTE: do NOT ignore dist/ — GitHub Actions requires bundled JS to be committed.
+# JS-based actions (`runs.using: node20`) execute dist/<entry>/index.js directly
+# from the consumer's checkout; there is no install/build step on the runner.
