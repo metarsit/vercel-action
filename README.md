@@ -15,15 +15,17 @@ You can use them together or use just the setup action and call the CLI directly
 
 ## Quick start
 
-### 1. Add secrets
+### 1. Add secrets and variables
 
-Create a [Vercel access token](https://vercel.com/account/tokens) and add the following repository secrets:
+Create a [Vercel access token](https://vercel.com/account/tokens). Store the token as a **secret**; the org/project IDs are not sensitive — store them as repository **variables** so they don't waste secret slots and so they're visible in logs for easier debugging.
 
-| Secret | Where to find it |
-| --- | --- |
-| `VERCEL_TOKEN` | https://vercel.com/account/tokens |
-| `VERCEL_ORG_ID` | `.vercel/project.json` after running `vercel link` locally |
-| `VERCEL_PROJECT_ID` | `.vercel/project.json` after running `vercel link` locally |
+| Name | Type | Where to find it |
+| --- | --- | --- |
+| `VERCEL_TOKEN` | secret | https://vercel.com/account/tokens |
+| `VERCEL_ORG_ID` | variable | `.vercel/project.json` after running `vercel link` locally |
+| `VERCEL_PROJECT_ID` | variable | `.vercel/project.json` after running `vercel link` locally |
+
+> Reference secrets with `${{ secrets.NAME }}` and variables with `${{ vars.NAME }}`.
 
 ### 2. Add a workflow
 
@@ -50,8 +52,8 @@ jobs:
         uses: metarsit/vercel-action/deploy@v1
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-org-id: ${{ vars.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ vars.VERCEL_PROJECT_ID }}
           prod: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Comment preview URL on PR
@@ -105,8 +107,8 @@ If you do not want the deploy wrapper, the setup action plus a few `run:` steps 
 - name: Pull Vercel environment
   run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
   env:
-    VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-    VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+    VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
 
 - name: Build
   run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
@@ -188,7 +190,7 @@ jobs:
       - run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
 ```
 
-> Store `VERCEL_ORG_ID` and per-app `VERCEL_PROJECT_ID_*` as repo **variables** (not secrets) — they are not sensitive and `vars.*` keeps secrets scoped to the token only.
+> Each app gets its own `VERCEL_PROJECT_ID_<APP>` variable. `vars[matrix.project_id]` resolves the per-row name dynamically.
 
 ---
 
@@ -233,8 +235,8 @@ jobs:
         uses: metarsit/vercel-action/deploy@v1
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-org-id: ${{ vars.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ vars.VERCEL_PROJECT_ID }}
           prod: ${{ github.ref == 'refs/heads/main' }}
 
       - run: echo "Deployed to ${{ steps.deploy.outputs.preview-url }}"
@@ -248,8 +250,8 @@ jobs:
 - uses: metarsit/vercel-action/deploy@v1
   with:
     vercel-token: ${{ secrets.VERCEL_TOKEN }}
-    vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-    vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+    vercel-org-id: ${{ vars.VERCEL_ORG_ID }}
+    vercel-project-id: ${{ vars.VERCEL_PROJECT_ID }}
     working-directory: apps/web
     prod: true
 ```
@@ -260,8 +262,8 @@ jobs:
 - uses: metarsit/vercel-action/deploy@v1
   with:
     vercel-token: ${{ secrets.VERCEL_TOKEN }}
-    vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-    vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+    vercel-org-id: ${{ vars.VERCEL_ORG_ID }}
+    vercel-project-id: ${{ vars.VERCEL_PROJECT_ID }}
     prebuilt: false
 ```
 
