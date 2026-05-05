@@ -98,10 +98,11 @@ async function run(): Promise<void> {
 
     core.setSecret(token);
 
-    const env: NodeJS.ProcessEnv = {
-      ...process.env,
-      VERCEL_TOKEN: token,
-    };
+    const env: { [key: string]: string } = {};
+    for (const [key, value] of Object.entries(process.env)) {
+      if (value !== undefined) env[key] = value;
+    }
+    env.VERCEL_TOKEN = token;
     if (orgId) env.VERCEL_ORG_ID = orgId;
     if (projectId) env.VERCEL_PROJECT_ID = projectId;
 

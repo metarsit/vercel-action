@@ -7,3 +7,4 @@ lib/
 .vercel
 coverage/
 .pnpm-store/
+dist/
