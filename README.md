@@ -192,6 +192,26 @@ jobs:
 
 > Each app gets its own `VERCEL_PROJECT_ID_<APP>` variable. `vars[matrix.project_id]` resolves the per-row name dynamically.
 
+### Pair with `vercel.json` to skip duplicate Vercel builds
+
+If you use the PR build check above and let Vercel's Git integration handle real deploys, you probably don't want Vercel to also build every preview branch — it doubles CI minutes and clutters dashboards. Add an [`ignoreCommand`](https://vercel.com/docs/projects/project-configuration/ignored-build-step) to your repo's `vercel.json` so Vercel only builds for the targets you care about:
+
+```json
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "ignoreCommand": "if [ \"$VERCEL_TARGET_ENV\" = \"production\" ] || [ \"$VERCEL_TARGET_ENV\" = \"staging\" ]; then exit 1; else exit 0; fi"
+}
+```
+
+How it works:
+
+- `ignoreCommand` runs before each Vercel build. **Exit `0` = skip the build, exit `1` = continue.**
+- The snippet above continues only for `production` and `staging` custom environments. Everything else (preview branches, etc.) is skipped.
+- If you don't have custom environments, drop the `staging` clause and keep only `production`. Add more clauses for any custom environment you've defined under Project Settings → Environments.
+- Pairs nicely with the matrix build check — PRs get verified by this action, while Vercel only spends build minutes on the environments that actually deploy.
+
+> Commit `vercel.json` to the root of each Vercel-linked project (or to the linked subdirectory in a monorepo).
+
 ---
 
 ## Deploy action
